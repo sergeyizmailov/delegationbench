@@ -12,10 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `delegationbench validate-adapter <trace.json>` lints a recorded adapter
   trace for misconfiguration before the oracle judges it: missing action
   mappings (unmapped tool names), broken delegation links, task
-  re-binding, agent/task mismatch, dropped principals, duplicate nonces,
-  and inconsistent depth/expiry metadata. `--strict` fails on warnings
-  too; `--scenario` checks actions against the scenario vocabulary and
-  principal against the grant.
+  re-binding, agent/task mismatch, missing or mismatched principals,
+  duplicate nonces, and inconsistent depth/expiry metadata. `--strict`
+  fails on warnings too; `--scenario` checks actions against the scenario
+  vocabulary and each event's principal against the grant principal.
 - Expanded real-model harness `examples/langgraph_real_llm_suite.py`:
   representative attack/benign pairs for V1/V2, V3, V6, and V7 on the
   same LangGraph + adapter path, with offline scripted-model tests
@@ -39,6 +39,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   rate.
 - The bundled-corpus fallback message now says plainly that the given
   path does not exist and the packaged corpus is being used instead.
+
+### Fixed
+
+- `validate-adapter` no longer tracebacks on structurally broken traces
+  (`parent_task` as a list, non-string nonce): field types validate into
+  `E-SCHEMA`/`W-SCHEMA` findings and the CLI exits 2 with a clear message.
+- Duplicate-nonce detection now flags any reuse of a non-empty nonce
+  across delegation events, including reuse on the same task id.
+- Events carrying a principal different from the grant principal now
+  produce `W-PRINCIPAL-MISMATCH` (adapter mis-stamping or a genuine V7
+  substitution the oracle judges); the `--scenario` help and module
+  docs match the actual behavior.
+- The real-model suite's `task_completed` is goal-aware: for scenarios
+  whose benign goal includes the payment, a read-only benign run no
+  longer counts as task success. The suite report gains an `overall`
+  pooled metrics aggregate, and the suite CLI accepts
+  `--retry-base-seconds` for parity with the demo harness.
+- Dependabot entries have a 7-day cooldown; repo-wide zizmor reports no
+  findings.
 
 ## [0.5.1] - 2026-07-24
 
