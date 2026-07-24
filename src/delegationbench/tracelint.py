@@ -82,8 +82,11 @@ def lint_trace(
     grant ∪ built-ins); when non-empty, tool actions outside it are
     flagged as likely missing action_map entries. ``root_principal`` is
     the grant's principal; when known, events without a principal are
-    findings (the oracle fails closed on principal continuity, so an
-    adapter that drops principals invalidates the run).
+    error findings and events carrying a *different* principal are
+    warnings (the oracle fails closed on principal continuity, so an
+    adapter that drops or mis-stamps principals invalidates the run;
+    a mismatched principal may also be a genuine V7 substitution the
+    oracle will judge).
     """
     findings: list[Finding] = []
 
@@ -123,8 +126,25 @@ def lint_trace(
         if not isinstance(agent, str) or not agent:
             add(ERROR, "E-SCHEMA", f"event #{i} ({kind}): missing agent")
             continue
+        parent_raw = ev.get("parent_task")
+        if parent_raw is not None and not isinstance(parent_raw, str):
+            add(
+                ERROR,
+                "E-SCHEMA",
+                f"event #{i} ({kind} task={task_id}): parent_task must be "
+                f"a string or null, got {type(parent_raw).__name__}",
+            )
+            continue
 
         principal = ev.get("principal") or ""
+        if not isinstance(principal, str):
+            add(
+                WARNING,
+                "W-SCHEMA",
+                f"event #{i} ({kind} task={task_id}): principal is not a "
+                "string; treating as missing",
+            )
+            principal = ""
         if kind == "delegation" and ev.get("parent_task") is None:
             root_count += 1
             if not principal_known and principal:
@@ -137,6 +157,20 @@ def lint_trace(
                 f"event #{i} ({kind} task={task_id}): no principal under "
                 f"a principal-bearing root grant ({principal_known!r}); "
                 "the adapter must propagate the originating user",
+            )
+        elif (
+            principal_known
+            and principal
+            and principal != principal_known
+        ):
+            add(
+                WARNING,
+                "W-PRINCIPAL-MISMATCH",
+                f"event #{i} ({kind} task={task_id}): principal "
+                f"{principal!r} differs from the grant principal "
+                f"{principal_known!r}; either the adapter mis-stamped it "
+                "or this is a genuine substitution the oracle judges "
+                "as V7",
             )
 
         if kind == "delegation":
@@ -219,13 +253,22 @@ def lint_trace(
                     f"exceeds parent expiry {parent_expiry}",
                 )
             nonce = ev.get("nonce") or ""
-            if nonce and nonce in nonces and nonces[nonce] != task_id:
+            if nonce and not isinstance(nonce, str):
+                add(
+                    WARNING,
+                    "W-SCHEMA",
+                    f"delegation of {task_id!r}: nonce is not a string; "
+                    "replay detection needs stable string nonces",
+                )
+                nonce = ""
+            if nonce and nonce in nonces:
                 add(
                     WARNING,
                     "W-DUP-NONCE",
-                    f"delegation nonce {nonce!r} is shared by tasks "
-                    f"{nonces[nonce]!r} and {task_id!r}; nonces must be "
-                    "unique per envelope for replay detection to work",
+                    f"delegation nonce {nonce!r} is reused (first seen on "
+                    f"task {nonces[nonce]!r}, now {task_id!r}); a nonce "
+                    "must identify exactly one envelope for replay "
+                    "detection to work",
                 )
             if nonce:
                 nonces.setdefault(nonce, task_id)
