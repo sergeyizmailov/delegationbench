@@ -271,4 +271,4 @@ If the harness uses `create_agent`, optionally add a `wrap_tool_call` middleware
 - [PyPI — langgraph-supervisor](https://pypi.org/project/langgraph-supervisor/)
 - PyPI JSON API for `langgraph`, `langchain`, `langchain-core` (version/release dates)
 - [GitHub — langchain#34168 (tool_call_id not passed to on_tool_start)](https://github.com/langchain-ai/langchain/issues/34168)
-- [GitHub — langgraph discussion #2606 (missing on_tool_error in astream_events)](https://github.com/langchain-ai/langgraph/discussions/2606)
+- [GitHub — LangChain issue #30708 (missing `on_tool_error` in `astream_events`)](https://github.com/langchain-ai/langchain/issues/30708)

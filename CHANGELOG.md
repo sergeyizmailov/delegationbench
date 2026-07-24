@@ -58,6 +58,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--retry-base-seconds` for parity with the demo harness.
 - Dependabot entries have a 7-day cooldown; repo-wide zizmor reports no
   findings.
+- The real-model workflow now allows up to six hours for the expanded suite;
+  observed hosted inference can exceed the former 90-minute limit while
+  continuing to make progress.
+- CI runs the repository's hash-locked Ruff version explicitly.
+- External-validation documentation records the independently confirmed
+  v0.4.5 CI follow-up and treats the validation kit as an ongoing reproducible
+  feedback process rather than an unfinished endorsement target.
+- The benchmark protocol now states the non-circular provenance rule
+  explicitly: a report may identify an immutable release-candidate commit and
+  then be included in the release that publishes it. Any metadata correction
+  must preserve the source hash and per-run evidence and carry an explicit
+  correction log.
+
+### Security
+
+- The real-model client rejects non-HTTP(S), relative, and hostname-free
+  endpoint URLs before making a request.
+- Real-model reports capture the harness commit when the process starts,
+  preventing a branch switch during a long hosted-inference run from
+  misattributing the generated evidence.
 
 ## [0.5.1] - 2026-07-24
 
@@ -395,13 +415,15 @@ Initial public release.
 - **CI** — GitHub Actions: pytest plus full corpus runs with and without the
   reference defense, on Python 3.10/3.12/3.13.
 
-[Unreleased]: https://github.com/sergeyizmailov/delegationbench/compare/v0.4.5...HEAD
-[0.4.5]: https://github.com/sergeyizmailov/delegationbench/releases/tag/v0.4.5
-[0.4.4]: https://github.com/sergeyizmailov/delegationbench/releases/tag/v0.4.4
-[0.4.3]: https://github.com/sergeyizmailov/delegationbench/releases/tag/v0.4.3
-[0.4.2]: https://github.com/sergeyizmailov/delegationbench/releases/tag/v0.4.2
-[0.4.1]: https://github.com/sergeyizmailov/delegationbench/releases/tag/v0.4.1
-[0.4.0]: https://github.com/sergeyizmailov/delegationbench/releases/tag/v0.4.0
-[0.3.0]: https://github.com/sergeyizmailov/delegationbench/releases/tag/v0.3.0
-[0.2.0]: https://github.com/sergeyizmailov/delegationbench/releases/tag/v0.2.0
-[0.1.0]: https://github.com/sergeyizmailov/delegationbench/releases/tag/v0.1.0
+[Unreleased]: https://github.com/sergeyizmailov/DelegationBench/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.5.1
+[0.5.0]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.5.0
+[0.4.5]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.4.5
+[0.4.4]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.4.4
+[0.4.3]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.4.3
+[0.4.2]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.4.2
+[0.4.1]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.4.1
+[0.4.0]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.4.0
+[0.3.0]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.3.0
+[0.2.0]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.2.0
+[0.1.0]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.1.0

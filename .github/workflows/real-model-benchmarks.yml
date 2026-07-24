@@ -27,7 +27,9 @@ jobs:
   nvidia:
     name: NVIDIA / ${{ matrix.slug }}
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # The expanded 80-trial suite can take several hours on rate-limited
+    # hosted endpoints. Keep a finite ceiling without discarding valid runs.
+    timeout-minutes: 360
     environment: benchmarks
     strategy:
       fail-fast: false

@@ -36,6 +36,7 @@ import statistics
 import subprocess
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 import uuid
 from dataclasses import dataclass
@@ -124,6 +125,9 @@ def git_commit() -> str:
         return "unavailable"
 
 
+HARNESS_COMMIT = git_commit()
+
+
 class OpenAICompatibleModel:
     """Small dependency-free client for OpenAI-compatible model servers."""
 
@@ -133,7 +137,16 @@ class OpenAICompatibleModel:
                  seed: int | None = None, max_tokens: int = 256,
                  max_retries: int = 3,
                  retry_base_seconds: float = 1.0) -> None:
-        self.url = base_url.rstrip("/") + "/chat/completions"
+        endpoint = base_url.rstrip("/") + "/chat/completions"
+        parsed_endpoint = urllib.parse.urlsplit(endpoint)
+        if (
+            parsed_endpoint.scheme not in {"http", "https"}
+            or not parsed_endpoint.hostname
+        ):
+            raise ValueError(
+                "base_url must be an absolute HTTP(S) URL with a hostname"
+            )
+        self.url = endpoint
         self.model = model
         self.api_key = api_key
         self.temperature = temperature
@@ -552,7 +565,7 @@ async def main_async(args: argparse.Namespace) -> int:
         "generated_at": datetime.datetime.now(
             datetime.timezone.utc).isoformat(),
         "delegationbench_version": delegationbench_version,
-        "harness_commit": git_commit(),
+        "harness_commit": HARNESS_COMMIT,
         "model": args.model,
         "model_revision": args.model_revision,
         "inference_server": {

@@ -50,6 +50,19 @@ def test_remote_endpoint_requires_key(monkeypatch):
         asyncio.run(DEMO.main_async(args))
 
 
+@pytest.mark.parametrize(
+    "base_url",
+    [
+        "file:///tmp/model",
+        "models.example/v1",
+        "ftp://models.example/v1",
+    ],
+)
+def test_model_rejects_non_http_endpoint(base_url):
+    with pytest.raises(ValueError, match=r"absolute HTTP\(S\) URL"):
+        DEMO.OpenAICompatibleModel(base_url, "open/model")
+
+
 def test_model_retries_rate_limit_and_parses_json(monkeypatch):
     response = Response({
         "choices": [{"message": {
@@ -118,3 +131,10 @@ def test_git_commit_identifies_harness_revision():
 
     assert len(commit) == 40
     assert all(character in "0123456789abcdef" for character in commit)
+
+
+def test_harness_commit_is_captured_at_import(monkeypatch):
+    captured = DEMO.HARNESS_COMMIT
+    monkeypatch.setattr(DEMO, "git_commit", lambda: "f" * 40)
+
+    assert DEMO.HARNESS_COMMIT == captured

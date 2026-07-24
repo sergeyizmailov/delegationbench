@@ -162,4 +162,3 @@ A demonstration paper showing that adversarial content (web pages, files, email 
 - https://arxiv.org/abs/2410.14923 — Imprompter paper (accessed 2026-07-23)
 - https://arxiv.org/abs/2503.12188 — Multi-Agent Systems Execute Arbitrary Malicious Code (accessed 2026-07-23)
 - https://rishijha.com/pubs/cfh.html — author publication page, empty code link (accessed 2026-07-23)
-- https://github.com/OWASP/AISVS/blob/main/research/chapters/C09-Orchestration-and-Agents/C09-08-Multi-Agent-Isolation.md — independent characterization (accessed 2026-07-23)
