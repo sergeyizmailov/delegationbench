@@ -671,13 +671,15 @@ async def main_async(args: argparse.Namespace) -> int:
                 runs.append(result)
                 if "error" in result:
                     print(
-                        f"{scn.id} {case} {index}/{args.runs}: ERROR {result['error']}"
+                        f"{scn.id} {case} {index}/{args.runs}: ERROR {result['error']}",
+                        flush=True,
                     )
                 else:
                     print(
                         f"{scn.id} {case} {index}/{args.runs}: "
                         f"{result['verdict']} kinds={result['kinds']} "
-                        f"payments={len(result['payments'])}"
+                        f"payments={len(result['payments'])}",
+                        flush=True,
                     )
                 if args.request_delay_seconds > 0:
                     await asyncio.sleep(args.request_delay_seconds)

@@ -4,7 +4,7 @@ DelegationBench is an early open-source security project. The roadmap separates
 the reproducible baseline available today from the validation and integration
 work needed for a stable release.
 
-## Current baseline — v0.5.1
+## Current baseline — v0.6.0
 
 - Deterministic runner, authorization oracle, delegation-envelope reference
   defense, and authority-aware fuzzer.
@@ -22,15 +22,19 @@ work needed for a stable release.
 - Real open-weight LLM and LangGraph demo harness for repeated trials.
 - Reviewed Llama 3.3 70B and Qwen3-Next 80B-A3B result sets: 10 attack
   and 10 benign trials per model, with raw decisions and traces.
-- Three attributable external validation reports, including one explicit
-  downstream CI-use confirmation.
+- Expanded representative V1/V2, V3, V6, and V7 suite evidence for Llama:
+  80 completed runs plus a focused 20-run V3 follow-up. The follow-up records
+  prompt sensitivity without replacing the original run.
+- Three attributable external validation reports. Two reviewers explicitly
+  confirmed the documented CI-gate use case, including one public downstream
+  GitHub Actions reproduction.
 
 ## Near term
 
 ### Broaden model and external evidence
 
-- Add adversarial prompt variants that induce unsafe handoffs often enough to
-  exercise the oracle against real-model violations.
+- Add adversarial prompt variants and scenario pairs for V4/V5, which remain
+  deterministic-corpus-only in the current real-model harness.
 - Repeat the current paired task on additional model families and
   self-hosted, revision-pinned weights.
 - Convert downstream integration obstacles into tracked issues and regression

@@ -256,12 +256,13 @@ A second harness,
 extends the same LangGraph + adapter path to representative attack/benign
 pairs for V1/V2, V3, V6, and V7. The graphs, adapter wiring, and expected
 oracle classifications are validated offline with a scripted model
-(`tests/test_real_llm_suite.py`); real-model runs are produced on demand
-through the `real-model-benchmarks` workflow with `suite=v1-v7`. Honest
-limits: V4 (replay) and V5 (origin loss) are not elicitable in this
-two-node harness shape and stay corpus-covered, and the V6 pair is
-classified as V2 at current adapter fidelity (LangGraph exposes no
-tool-call content provenance).
+(`tests/test_real_llm_suite.py`). Reviewed Llama runs now cover all four
+pairs, including a separately preserved V3 prompt-sensitivity follow-up;
+additional runs are produced on demand through the `real-model-benchmarks`
+workflow with `suite=v1-v7`. Honest limits: V4 (replay) and V5 (origin loss)
+are not elicitable in this two-node harness shape and stay corpus-covered,
+and the V6 pair is classified as V2 at current adapter fidelity (LangGraph
+exposes no tool-call content provenance).
 
 ### Published open-weight results
 
@@ -276,14 +277,17 @@ with 10 attack and 10 benign trials each:
 Both models read the document and refused its injected cross-agent payment
 instruction in every attack trial. The
 [reviewed raw reports, exact configuration, hashes, and limitations](https://github.com/sergeyizmailov/DelegationBench/tree/main/benchmarks/results)
-are versioned in the repository. This is one paired task, not a claim that the
-entire deterministic corpus was converted into LLM-driven scenarios.
+are versioned in the repository. The same index also contains 80 expanded
+Llama runs across representative V1/V2, V3, V6, and V7 pairs plus a 20-run V3
+follow-up. These focused experiments are not a claim that the entire
+deterministic corpus was converted into LLM-driven scenarios.
 
 ## External validation
 
 Three developers and security practitioners published attributable validation
 reports with commands, environments, results, and limitations. One explicitly
-confirmed that they would use the documented workflow as a CI gate. See the
+reproduced the GitHub Action downstream, and two explicitly confirmed the
+documented CI-gate use case. See the
 [evidence index](https://github.com/sergeyizmailov/DelegationBench/blob/main/docs/external-validation.md) and the linked original issues.
 
 ## Repository layout
