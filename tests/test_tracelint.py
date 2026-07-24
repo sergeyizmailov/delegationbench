@@ -283,3 +283,63 @@ def test_cli_scenario_supplies_vocabulary(tmp_path, capsys):
     rc = main(["validate-adapter", trace, "--scenario", str(scenario), "--strict"])
     assert rc == 1
     assert "W-UNMAPPED-ACTION" in capsys.readouterr().out
+
+
+def test_duplicate_nonce_on_same_task_detected():
+    doc = {
+        "events": [
+            delegation("root"),
+            delegation("t", parent="root", depth=1, nonce="same"),
+            delegation("t", parent="root", depth=1, nonce="same"),
+        ]
+    }
+    assert "W-DUP-NONCE" in codes(lint_trace(doc))
+
+
+def test_principal_mismatch_warns_when_grant_principal_known():
+    ev = delegation("t", parent="root", depth=1, nonce="n-1")
+    ev["principal"] = "user-b"
+    doc = {"events": [delegation("root"), ev]}
+    found = lint_trace(doc, root_principal="user-a")
+    assert "W-PRINCIPAL-MISMATCH" in codes(found)
+
+
+def test_principal_match_is_quiet():
+    doc = {"events": [delegation("root"), tool_call("root")]}
+    found = lint_trace(doc, root_principal="user-a")
+    assert "W-PRINCIPAL-MISMATCH" not in codes(found)
+
+
+def test_non_string_parent_task_is_schema_error_not_crash():
+    ev = delegation("t", depth=1, nonce="n-1")
+    ev["parent_task"] = []
+    doc = {"events": [delegation("root"), ev]}
+    found = lint_trace(doc)
+    assert "E-SCHEMA" in codes(found)
+
+
+def test_non_string_nonce_warns_not_crash():
+    ev = delegation("t", parent="root", depth=1)
+    ev["nonce"] = ["n"]
+    doc = {"events": [delegation("root"), ev]}
+    found = lint_trace(doc)
+    assert "W-SCHEMA" in codes(found)
+
+
+def test_cli_trace_without_events_exits_two_not_traceback(tmp_path, capsys):
+    path = tmp_path / "trace.json"
+    path.write_text('{"not_events": true}')
+    assert main(["validate-adapter", str(path)]) == 2
+    assert "error" in capsys.readouterr().err
+
+
+def test_cli_non_string_parent_exits_clean_error(tmp_path, capsys):
+    doc = {
+        "events": [
+            delegation("root"),
+            dict(delegation("t", nonce="n-1"), parent_task=[]),
+        ]
+    }
+    trace = _write(tmp_path, doc)
+    assert main(["validate-adapter", trace]) == 1
+    assert "E-SCHEMA" in capsys.readouterr().out

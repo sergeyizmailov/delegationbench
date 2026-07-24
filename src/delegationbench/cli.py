@@ -299,8 +299,12 @@ def _cmd_validate_adapter(args: argparse.Namespace) -> int:
         actions = resolve_actions(scn.actions) | scn.grant.allowed_actions
         root_principal = scn.principal
 
-    findings = lint_trace(doc, actions=actions,
-                          root_principal=root_principal)
+    try:
+        findings = lint_trace(doc, actions=actions,
+                              root_principal=root_principal)
+    except TraceLintError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return EXIT_ERROR
     errors = sum(f.severity == LINT_ERROR for f in findings)
     if args.format == "json":
         payload = {
@@ -391,8 +395,9 @@ def build_parser() -> argparse.ArgumentParser:
                            "Trace.to_json() / adapter build_trace())")
     lint.add_argument("--scenario",
                       help="optional scenario .yaml: checks tool actions "
-                           "against its action vocabulary and principal "
-                           "against its grant")
+                           "against its action vocabulary and each "
+                           "event's principal (missing or mismatched) "
+                           "against the grant principal")
     lint.add_argument("--strict", action="store_true",
                       help="fail on warnings too, not only errors "
                            "(ambiguous or incomplete traces fail)")
