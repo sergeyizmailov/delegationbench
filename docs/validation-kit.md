@@ -1,9 +1,10 @@
 # External Validation Kit
 
-Goal: show a working trace to 3–5 potential users and record their answers.
-This is a human validation step. At least one respondent should confirm that
-they would test or use DelegationBench in a workflow or CI, or demonstrate the
-equivalent by running it.
+Purpose: help maintainers collect reproducible, attributable feedback from
+potential users. DelegationBench currently has three public reports, including
+independent downstream CI reproduction and an explicit confirmation that the
+documented CI gate is usable. Keep using this kit for future framework and
+security-engineer feedback; it is not a request for endorsements.
 
 ## Whom to approach
 
@@ -174,7 +175,11 @@ https://github.com/sergeyizmailov/delegationbench
   the respondent's own topology.
 - Evidence: [validation issue #20](https://github.com/sergeyizmailov/DelegationBench/issues/20)
   and its [live CI follow-up](https://github.com/sergeyizmailov/DelegationBench/issues/20#issuecomment-5064912770).
-- Follow-up: rerun against v0.4.5 and reassess the remaining adoption blockers.
+- Follow-up: the reviewer reran the same downstream CI integration against
+  v0.4.5 and independently confirmed the SARIF upload, baseline-contract, and
+  signing-key fixes. The final assessment is **Yes** for the documented CI
+  use case. See the
+  [verification comment](https://github.com/sergeyizmailov/DelegationBench/issues/20#issuecomment-5065190494).
 
 ### 2026-07-24 — @wodastoks-source
 
@@ -186,6 +191,18 @@ https://github.com/sergeyizmailov/delegationbench
   LangGraph side project, but has not yet integrated a live system.
 - Evidence: [validation issue #21](https://github.com/sergeyizmailov/DelegationBench/issues/21).
 
-Current count: **2/3–5 public reproductions**. One downstream GitHub Actions
-integration has been demonstrated; a genuine unconditional workflow/CI
-adoption confirmation is still pending.
+### 2026-07-24 — @ofareref
+
+- Public attribution: approved.
+- Reviewed: v0.4.5 from PyPI and the matching tagged source.
+- Reproduced: clean installation, 75-scenario corpus in all defense modes,
+  fail-closed signing behavior, 302 tests, LangGraph integration, all machine
+  report formats, and a tampered-expectation negative test.
+- Workflow/CI answer: **Yes** for the documented CI gate; the reviewer
+  specifically confirmed the exit-code contract, JUnit, SARIF, and benchmark
+  JSON fit an existing platform/DevOps workflow.
+- Evidence: [validation issue #24](https://github.com/sergeyizmailov/DelegationBench/issues/24).
+
+Current count: **3 public reproductions**. One downstream GitHub Actions
+repository is public, and two reviewers explicitly confirmed the documented
+CI-gate use case after the independently discovered defects were fixed.

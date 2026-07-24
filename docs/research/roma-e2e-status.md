@@ -1,8 +1,7 @@
 # ROMA End-to-End Status
 
 This note records exactly where the ROMA end-to-end demonstration stands, what
-blocks a live run, and the proposed path — per the pre-submission review's
-Priority 2.
+blocks a live run, and the proposed integration path.
 
 ## What exists today
 

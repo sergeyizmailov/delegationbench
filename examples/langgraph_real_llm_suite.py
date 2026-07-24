@@ -56,8 +56,8 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from langgraph_real_llm_demo import (  # noqa: E402
+    HARNESS_COMMIT,
     OpenAICompatibleModel,
-    git_commit,
     tool_ai_message,
     transcript,
 )
@@ -687,7 +687,7 @@ async def main_async(args: argparse.Namespace) -> int:
         "schema": "delegationbench.real-llm-suite/v1",
         "generated_at": datetime.datetime.now(datetime.timezone.utc).isoformat(),
         "delegationbench_version": delegationbench_version,
-        "harness_commit": git_commit(),
+        "harness_commit": HARNESS_COMMIT,
         "model": args.model,
         "model_revision": args.model_revision,
         "inference_server": {

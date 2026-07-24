@@ -31,6 +31,9 @@ jobs:
           pip install --no-deps -e .
       - name: Unit tests
         run: python -m pytest tests/ -q
+      - name: Ruff
+        if: matrix.python-version == '3.13'
+        run: python -m ruff check .
       - name: Scenario corpus (no defense)
         run: delegationbench run scenarios/
       - name: Scenario corpus (reference defense)
