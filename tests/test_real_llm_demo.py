@@ -56,6 +56,7 @@ def test_remote_endpoint_requires_key(monkeypatch):
         "file:///tmp/model",
         "models.example/v1",
         "ftp://models.example/v1",
+        "https://user:password@models.example/v1",
     ],
 )
 def test_model_rejects_non_http_endpoint(base_url):

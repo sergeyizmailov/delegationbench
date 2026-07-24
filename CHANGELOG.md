@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-07-24
+
 ### Added
 
 - `delegationbench validate-adapter <trace.json>` lints a recorded adapter
@@ -23,6 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `real-model-benchmarks` workflow accepts `suite=v1-v7`. V4/V5 remain
   corpus-only by design; the V6 pair is classified V2 at current adapter
   fidelity (documented).
+- Reviewed expanded Llama evidence: 80 completed trials across the four
+  representative pairs (30/40 attacks produced the expected violation, 0/40
+  benign false positives, 40/40 benign task success) plus a separately
+  preserved 20-run V3 prompt-sensitivity follow-up (10/10 expected V3
+  violations and 10/10 benign task success).
 - `--junit-detail summary|failures|full` controls how much JUnit
   `system-out` carries (a matching corpus drops from ~226 KB to ~5 KB at
   `summary`/`failures`). Full traces stay in the JSON formats; `full`
@@ -58,23 +65,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `--retry-base-seconds` for parity with the demo harness.
 - Dependabot entries have a 7-day cooldown; repo-wide zizmor reports no
   findings.
-- The real-model workflow now allows up to six hours for the expanded suite;
-  observed hosted inference can exceed the former 90-minute limit while
-  continuing to make progress.
+- The real-model workflow splits the expanded suite into independently
+  reviewable per-model, per-scenario jobs. This prevents slow hosted inference
+  from losing an entire 80-trial campaign at GitHub's per-job ceiling;
+  workflow-level concurrency prevents overlapping campaigns.
+- Expanded-suite progress lines flush immediately, so long hosted runs remain
+  observable in redirected logs and CI rather than buffering until completion.
 - CI runs the repository's hash-locked Ruff version explicitly.
 - External-validation documentation records the independently confirmed
   v0.4.5 CI follow-up and treats the validation kit as an ongoing reproducible
-  feedback process rather than an unfinished endorsement target.
+  feedback process rather than an unfinished endorsement target. The roadmap
+  now distinguishes two explicit CI-gate confirmations from the single public
+  downstream CI reproduction.
 - The benchmark protocol now states the non-circular provenance rule
   explicitly: a report may identify an immutable release-candidate commit and
   then be included in the release that publishes it. Any metadata correction
   must preserve the source hash and per-run evidence and carry an explicit
   correction log.
+- NVIDIA reproduction instructions now select the expanded `v1-v7` workflow
+  suite and use the matching local suite harness and output names.
 
 ### Security
 
-- The real-model client rejects non-HTTP(S), relative, and hostname-free
-  endpoint URLs before making a request.
+- The real-model client rejects non-HTTP(S), relative, hostname-free, and
+  credential-bearing endpoint URLs before making a request.
 - Real-model reports capture the harness commit when the process starts,
   preventing a branch switch during a long hosted-inference run from
   misattributing the generated evidence.
@@ -415,7 +429,8 @@ Initial public release.
 - **CI** — GitHub Actions: pytest plus full corpus runs with and without the
   reference defense, on Python 3.10/3.12/3.13.
 
-[Unreleased]: https://github.com/sergeyizmailov/DelegationBench/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/sergeyizmailov/DelegationBench/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.6.0
 [0.5.1]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.5.1
 [0.5.0]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.5.0
 [0.4.5]: https://github.com/sergeyizmailov/DelegationBench/releases/tag/v0.4.5

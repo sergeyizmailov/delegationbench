@@ -142,9 +142,12 @@ class OpenAICompatibleModel:
         if (
             parsed_endpoint.scheme not in {"http", "https"}
             or not parsed_endpoint.hostname
+            or parsed_endpoint.username is not None
+            or parsed_endpoint.password is not None
         ):
             raise ValueError(
-                "base_url must be an absolute HTTP(S) URL with a hostname"
+                "base_url must be an absolute HTTP(S) URL with a hostname "
+                "and no embedded credentials"
             )
         self.url = endpoint
         self.model = model

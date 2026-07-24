@@ -23,13 +23,16 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: real-model-benchmarks
+  cancel-in-progress: false
+
 jobs:
-  nvidia:
-    name: NVIDIA / ${{ matrix.slug }}
+  nvidia-legacy:
+    if: inputs.suite == 'legacy'
+    name: NVIDIA legacy / ${{ matrix.slug }}
     runs-on: ubuntu-latest
-    # The expanded 80-trial suite can take several hours on rate-limited
-    # hosted endpoints. Keep a finite ceiling without discarding valid runs.
-    timeout-minutes: 360
+    timeout-minutes: 180
     environment: benchmarks
     strategy:
       fail-fast: false
@@ -61,21 +64,14 @@ jobs:
           BENCHMARK_MODEL: ${{ matrix.model }}
           BENCHMARK_SLUG: ${{ matrix.slug }}
           BENCHMARK_RUNS: ${{ inputs.runs }}
-          BENCHMARK_SUITE: ${{ inputs.suite }}
         run: |
           if [ -z "$NVIDIA_API_KEY" ]; then
             echo "::error::NVIDIA_API_KEY is not configured in the benchmarks environment"
             exit 2
           fi
           mkdir -p benchmarks/results
-          if [ "$BENCHMARK_SUITE" = "v1-v7" ]; then
-            SCRIPT=examples/langgraph_real_llm_suite.py
-            OUT="benchmarks/results/nvidia-${BENCHMARK_SLUG}-suite.json"
-          else
-            SCRIPT=examples/langgraph_real_llm_demo.py
-            OUT="benchmarks/results/nvidia-${BENCHMARK_SLUG}.json"
-          fi
-          python "$SCRIPT" \
+          OUT="benchmarks/results/nvidia-${BENCHMARK_SLUG}.json"
+          python examples/langgraph_real_llm_demo.py \
             --model "$BENCHMARK_MODEL" \
             --base-url https://integrate.api.nvidia.com/v1 \
             --api-key-env NVIDIA_API_KEY \
@@ -97,6 +93,97 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: nvidia-${{ matrix.slug }}
-          path: benchmarks/results/*.json
+          path: benchmarks/results/nvidia-${{ matrix.slug }}.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  nvidia-suite:
+    if: inputs.suite == 'v1-v7'
+    name: NVIDIA suite / ${{ matrix.slug }} / ${{ matrix.scenario }}
+    runs-on: ubuntu-latest
+    # Split the suite so provider latency cannot discard every scenario at
+    # GitHub's per-job timeout. Each artifact remains independently reviewable.
+    timeout-minutes: 180
+    environment: benchmarks
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        include:
+          - model: meta/llama-3.3-70b-instruct
+            slug: llama-3.3-70b-instruct
+            scenario: v1v2-payment-escalation
+          - model: meta/llama-3.3-70b-instruct
+            slug: llama-3.3-70b-instruct
+            scenario: v3-depth-limit
+          - model: meta/llama-3.3-70b-instruct
+            slug: llama-3.3-70b-instruct
+            scenario: v6-result-driven-widening
+          - model: meta/llama-3.3-70b-instruct
+            slug: llama-3.3-70b-instruct
+            scenario: v7-principal-substitution
+          - model: qwen/qwen3-next-80b-a3b-instruct
+            slug: qwen3-next-80b-a3b-instruct
+            scenario: v1v2-payment-escalation
+          - model: qwen/qwen3-next-80b-a3b-instruct
+            slug: qwen3-next-80b-a3b-instruct
+            scenario: v3-depth-limit
+          - model: qwen/qwen3-next-80b-a3b-instruct
+            slug: qwen3-next-80b-a3b-instruct
+            scenario: v6-result-driven-widening
+          - model: qwen/qwen3-next-80b-a3b-instruct
+            slug: qwen3-next-80b-a3b-instruct
+            scenario: v7-principal-substitution
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install benchmark harness
+        run: |
+          python -m pip install --require-hashes -r .github/requirements-integration.txt
+          python -m pip install --no-deps -e .
+      - name: Run repeated attack and benign trials
+        env:
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          BENCHMARK_MODEL: ${{ matrix.model }}
+          BENCHMARK_SLUG: ${{ matrix.slug }}
+          BENCHMARK_SCENARIO: ${{ matrix.scenario }}
+          BENCHMARK_RUNS: ${{ inputs.runs }}
+        run: |
+          if [ -z "$NVIDIA_API_KEY" ]; then
+            echo "::error::NVIDIA_API_KEY is not configured in the benchmarks environment"
+            exit 2
+          fi
+          mkdir -p benchmarks/results
+          OUT="benchmarks/results/nvidia-${BENCHMARK_SLUG}-suite-${BENCHMARK_SCENARIO}.json"
+          python examples/langgraph_real_llm_suite.py \
+            --model "$BENCHMARK_MODEL" \
+            --scenario "$BENCHMARK_SCENARIO" \
+            --base-url https://integrate.api.nvidia.com/v1 \
+            --api-key-env NVIDIA_API_KEY \
+            --provider NVIDIA \
+            --model-revision provider-managed-not-exposed \
+            --server-name "NVIDIA hosted NIM API" \
+            --server-version provider-managed \
+            --hardware "NVIDIA-managed hosted inference; exact hardware undisclosed" \
+            --temperature 0 \
+            --max-tokens 256 \
+            --max-retries 5 \
+            --retry-base-seconds 3 \
+            --timeout 120 \
+            --request-delay-seconds 6 \
+            --runs "$BENCHMARK_RUNS" \
+            --output "$OUT"
+      - name: Upload raw benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: nvidia-${{ matrix.slug }}-${{ matrix.scenario }}
+          path: benchmarks/results/nvidia-${{ matrix.slug }}-suite-${{ matrix.scenario }}.json
           if-no-files-found: warn
           retention-days: 30

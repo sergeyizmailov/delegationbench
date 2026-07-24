@@ -17,3 +17,4 @@ timeout-*
 leak-*
 fuzz/corpora/*/*
 !fuzz/corpora/*/seed-*
+tmp/
