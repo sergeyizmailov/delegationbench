@@ -58,12 +58,20 @@ Before publishing a report:
 2. Confirm that attack and benign prompts differ only at the intended security
    boundary.
 3. Inspect failed and invalid runs rather than dropping them from aggregates.
-4. Reproduce the report from a tagged release and record the exact command.
+4. Run from a tagged release or an immutable release-candidate commit, record
+   that exact source revision and command, and include the report unchanged in
+   the subsequent release. A report cannot identify the release commit that
+   first contains the report itself.
 5. Verify that the report contains no credentials or private infrastructure
    details.
 
 Results from a tiny smoke-test model are not automatically publication-grade.
 They must be reviewed for task competence and harness validity.
+
+If review uncovers an incorrect metadata field, preserve the original artifact
+hash, leave all per-run records unchanged, and record the exact mechanical
+correction inside the reviewed report. Never silently repair model decisions,
+traces, outcomes, errors, or denominators.
 
 ## Example
 

@@ -7,7 +7,7 @@ attribution.
 
 | Report | Version tested | Evidence | Workflow / CI assessment |
 |---|---|---|---|
-| [Issue #20](https://github.com/sergeyizmailov/DelegationBench/issues/20) by [`@itsmilaverden-droid`](https://github.com/itsmilaverden-droid) | v0.4.4 | Clean PyPI install, full corpus and tests, report formats, plus a [separate downstream CI repository](https://github.com/itsmilaverden-droid/delegationbench-ci-test). The CI run found three defects that were fixed in v0.4.5. | Conditional in the reviewer's original report. |
+| [Issue #20](https://github.com/sergeyizmailov/DelegationBench/issues/20) by [`@itsmilaverden-droid`](https://github.com/itsmilaverden-droid) | v0.4.4; fixes retested on v0.4.5 | Clean PyPI install, full corpus and tests, report formats, plus a [separate downstream CI repository](https://github.com/itsmilaverden-droid/delegationbench-ci-test). The CI run found three defects that were fixed and [independently confirmed](https://github.com/sergeyizmailov/DelegationBench/issues/20#issuecomment-5065190494) on v0.4.5. | **Yes** for the documented CI-gate use case after the v0.4.5 follow-up. |
 | [Issue #21](https://github.com/sergeyizmailov/DelegationBench/issues/21) by [`@wodastoks-source`](https://github.com/wodastoks-source) | v0.4.4 | Clean PyPI install, full corpus and tests, LangGraph integration, reports, and paired-scenario review. | Conditional pending custom scenarios and live-system adapter validation. |
 | [Issue #24](https://github.com/sergeyizmailov/DelegationBench/issues/24) by [`@ofareref`](https://github.com/ofareref) | v0.4.5 | Clean PyPI install, 302 tests, all defense modes including fail-closed signing, report formats, and a tampered-expectation negative test. | **Yes** for the documented CI-gate use case. |
 
