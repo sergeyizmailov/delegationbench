@@ -6,4 +6,4 @@ pytest
 jsonschema
 build
 PyYAML>=6.0
-ruff==0.16.0
+ruff==0.16.3
